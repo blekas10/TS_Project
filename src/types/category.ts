@@ -1,5 +1,5 @@
 type Category = {
     id: string,
-    title:string,
-    
+    title: string,
 }
+export default Category;

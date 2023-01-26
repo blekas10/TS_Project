@@ -7,7 +7,7 @@
     "build": "webpack --config webpack.config.prod.js",
     "start": "webpack serve --config webpack.config.dev.js"
   },
-  "author": "Žilvinas Vidmantas",
+  "author": "Nojus",
   "license": "ISC",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.30.7",
