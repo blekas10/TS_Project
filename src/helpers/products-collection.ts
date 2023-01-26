@@ -1,6 +1,8 @@
+import productsCategories from "../data/products-categories";
 import type Category from "../types/category";
 import type Product from "../types/product";
 import type ProductCategory from "../types/product-category";
+import type Productjoined from "../types/product-joined";
 
 type ProductsCollectionProps = {
     products: Product[],
@@ -8,21 +10,41 @@ type ProductsCollectionProps = {
     productsCategories: ProductCategory[],
 };
 
-
-
-
-
 class ProductsCollection {
-    private products: Product[];
-    private categories: Category[];
-    private productsCategories: ProductCategory[];
+    private privateProducts: Product[];
+
+    private privateCategories: Category[];
+
+    private privateProductsCategories: ProductCategory[];
 
     constructor({products, categories, productsCategories}: ProductsCollectionProps) {
         
-        this.products = JSON.parse(JSON.stringify(products));
-        this.categories = JSON.parse(JSON.stringify(categories));
-        this.productsCategories = JSON.parse(JSON.stringify(productsCategories));
+        this.privateProducts = JSON.parse(JSON.stringify(products));
 
+        this.privateCategories = JSON.parse(JSON.stringify(categories));
+
+        this.privateProductsCategories = JSON.parse(JSON.stringify(productsCategories));
+
+    }
+
+    private joinProduct = (product: Product): Productjoined => {
+
+        const categoriesIds = this.privateProductsCategories.filter     (productCategory => productCategory.productId === product.id)
+        .map(productCategory => productCategory.categoryId);
+
+        const categories = this.privateCategories.filter(category => categoriesIds.includes(category.id))
+        .map(category => category.title)
+        .join(", ");
+
+        
+        return {
+            ...product,
+            categories,
+        };
+    }
+
+    get all(): Productjoined[]{
+        return this.privateProducts.map(this.joinProduct)
     }
 }
 

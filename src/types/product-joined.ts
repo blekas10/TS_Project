@@ -1,7 +1,7 @@
 import Product from "./product";
 
 type Productjoined = Product & {
-    categoiries:string,
+    categories:string,
 };
 
 export default Productjoined;
