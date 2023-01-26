@@ -1,4 +1,3 @@
-import productsCategories from "../data/products-categories";
 import type Category from "../types/category";
 import type Product from "../types/product";
 import type ProductCategory from "../types/product-category";

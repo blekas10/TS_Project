@@ -1,16 +1,7 @@
-import categories from "./data/categories";
-import products from "./data/products";
-import productsCategories from "./data/products-categories";
-import ProductsCollection from "./helpers/products-collection";
+import App from "./components/app";
 
-
-const productsCollection = new ProductsCollection({
-    products,
-    categories,
-    productsCategories,
-});
-
-console.log(productsCollection.all);
+const app = new App("#root");
+app.initialize();
 
 
 
