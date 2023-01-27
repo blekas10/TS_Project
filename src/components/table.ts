@@ -1,89 +1,97 @@
+import countObjectProperties from '../helpers/count-object-properties';
 
-import getPropCount from "../helpers/get-prop-count";
+type RowData = {
+  id: string,
+  [key: string]: string,
+};
 
-type rowData = {
-    [key:string]:string
-}
+export type TableProps<Type> = {
+  title: string,
+  columns: Type,
+  rowsData: Type[],
+};
 
-type TableProps<Type extends rowData> = {
-    title: string,
-    columns: Type,
-    rowsData: Type[],
-}
+class Table<Type extends RowData> {
+  public htmlElement: HTMLTableElement;
 
-class Table<Type extends rowData> {
+  private props: TableProps<Type>;
 
-    static propsAreValid = <T extends rowData>({columns, rowsData}: TableProps<T>): boolean => {
-        const colCount = getPropCount(columns);
+  private tbody: HTMLTableSectionElement;
 
-        return rowsData.every(row => getPropCount(row) === colCount)
-    };
-    
-    private props: TableProps<Type>;
-    private tbody: HTMLTableSectionElement;
-    private thead: HTMLTableSectionElement;
-    public htmlElement: HTMLTableElement;
+  private thead: HTMLTableSectionElement;
 
-    constructor(props: TableProps<Type>){
-        if(!Table.propsAreValid(props)){
-            throw new Error('props are not compatable. Please check columns and rows data ')
-        }
+  public constructor(props: TableProps<Type>) {
+    this.props = props;
+    this.checkColumnsCompatability();
 
-        this.props = props;
-        this.thead = document.createElement('thead');
-        this.tbody = document.createElement('tbody');
-        this.htmlElement = document.createElement('table');
+    this.htmlElement = document.createElement('table');
+    this.thead = document.createElement('thead');
+    this.tbody = document.createElement('tbody');
 
-        this.initialize();
+    this.initialize();
+  }
+
+  private checkColumnsCompatability = (): void => {
+    const { rowsData, columns } = this.props;
+
+    if (this.props.rowsData.length === 0) return;
+    const columnCount = countObjectProperties(columns);
+
+    const columnsCompatableWithRowsData = rowsData.every((row) => {
+      const rowCellsCount = countObjectProperties(row);
+
+      return rowCellsCount === columnCount;
+    });
+
+    if (!columnsCompatableWithRowsData) {
+      throw new Error('Nesutampa lentelės stulpelių skaičius su eilučių stulpelių skaičiumi');
     }
+  };
 
-    initializeHead = () => {
-        console.log(this.props.columns);
+  private initializeHead = (): void => {
+    const { title, columns } = this.props;
 
-        const thElementsString = Object.values(this.props.columns).map(columnName => `<th>${columnName}</th>`).join("")
-        
-        const columnCount = thElementsString.length;
+    const headersArray = Object.values(columns);
+    const headersRowHtmlString = headersArray.map((header) => `<th>${header}</th>`).join('');
 
-        this.thead.className = 'bg-dark text-white' 
-        this.thead.innerHTML = `
-        <tr class="text-center h2">
-            <th colspan="${columnCount}">${this.props.title}</th>
-        </tr>
-        <tr>
-            ${thElementsString}
-        </tr>
-        `;
-            
-    };
+    this.thead.innerHTML = `
+      <tr>
+        <th colspan="${headersArray.length}" class="text-center h3">${title}</th>
+      </tr>
+      <tr>${headersRowHtmlString}</tr>
+    `;
+  };
 
-    initializeBody = () => {
-        const trsHtmlString = this.props.rowsData.map((rowData) => {
+  private initializeBody = (): void => {
+    const { rowsData, columns } = this.props;
 
-            const tdsHtmlStr= Object.keys(this.props.columns).map(key => `<td>${rowData[key]}</td>`).join("");
+    this.tbody.innerHTML = '';
+    const rowsHtmlElements = rowsData
+      .map((rowData) => {
+        const rowHtmlElement = document.createElement('tr');
 
-            return `<tr>${tdsHtmlStr}</tr>`;
-        })
-        .join('');
+        const cellsHtmlString = Object.keys(columns)
+          .map((key) => `<td>${rowData[key]}</td>`)
+          .join(' ');
 
-        console.log(trsHtmlString);
-        
+        rowHtmlElement.innerHTML = cellsHtmlString;
 
+        return rowHtmlElement;
+      });
 
-        this.tbody.innerHTML = trsHtmlString;
-    };
+    this.tbody.append(...rowsHtmlElements);
+  };
 
+  private initialize = (): void => {
+    this.initializeHead();
+    this.initializeBody();
 
-    initialize(){
-        this.initializeHead();
-        this.initializeBody();
-
-        this.htmlElement.className = 'table table-striped'
-        
-        this.htmlElement.append(
-            this.thead,
-            this.tbody
-        )
-    }
+    this.htmlElement.className = 'table table-striped order border p-3';
+    this.htmlElement.append(
+      this.thead,
+      this.tbody,
+    );
+  };
 }
 
 export default Table;

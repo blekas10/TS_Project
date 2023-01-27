@@ -1,7 +1,4 @@
-import App from "./components/app";
+import App from './components/app';
 
-const app = new App("#root");
+const app = new App('#root');
 app.initialize();
-
-
-
