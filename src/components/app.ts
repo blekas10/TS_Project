@@ -3,6 +3,19 @@ import products from "../data/products";
 import productsCategories from "../data/products-categories";
 import ProductsCollection from "../helpers/products-collection";
 import Table from "./table";
+import Productjoined from "../types/product-joined"
+import stringifyProps, { StringifiedObject } from "../helpers/stringify-props";
+
+
+type ProductTableRow = StringifiedObject<Required<Productjoined>>;
+
+const JoinedProductToTableRow = ({description, ...props}: Productjoined):ProductTableRow => {
+    
+    return stringifyProps({
+        ...props,
+        description: description ?? '---',
+    })
+};
 
 
 class App {
@@ -34,17 +47,15 @@ class App {
     initialize(){
         
         const table = new Table({
-            title:"test lent",
+            title:"Visi produktai",
             columns: {
-                name:'Pavadinimas',
-                price: 'kaina',
-                price1: '1kaina'
+                id:"ID",
+                title:"title",
+                price:"price",
+                description:"description",
+                categories:"categories",
             },
-            rowsData: [
-                {name:'Pavadinimas', price: '1',price1: 'kaina',},
-                {name:'Pavadinimas', price: '2',price1: 'kaina111',},
-                {name:'Pavadinimas', price: '3',price1: 'kaina222',},
-            ]
+            rowsData: this.productsCollection.all.map(JoinedProductToTableRow)
         });
 
         const container = document.createElement('div');
