@@ -10,27 +10,42 @@ type CarsCollectionProps = {
 };
 
 class CarsCollection {
-  private props: CarsCollectionProps;
+  constructor(private props: CarsCollectionProps) { }
 
-  constructor(props: CarsCollectionProps) {
-    this.props = props;
-  }
-
-  private joinCar = ({ modelId, ...car}: Car) => {
+  private joinCar = ({ modelId, ...car }: Car) => {
     const { brands, models } = this.props;
+
     const carModel = models.find((model) => model.id === modelId);
     const carBrand = brands.find((brand) => brand.id === carModel?.brandId);
 
     return {
       ...car,
-      brand: (carBrand && carBrand.title) ?? 'unknown',
-      model: (carModel && carModel.title) ?? 'unknown',
+      brand: (carBrand && carBrand?.title) ?? 'unknown',
+      model: (carModel && carModel?.title) ?? 'unknown',
     };
   };
 
   public get all(): CarJoined[] {
     return this.props.cars.map(this.joinCar);
   }
+
+  public getByBrandId = (brandId: string): CarJoined[] => {
+    const { cars, models } = this.props;
+
+    const brandModelsIds = models
+      .filter((model) => model.brandId === brandId)
+      .map((model) => model.id);
+
+    const brandCars = cars
+      .filter((car) => brandModelsIds.includes(car.modelId))
+      .map(this.joinCar);
+
+    return brandCars;
+  };
+
+  public deleteCarById = (carId: string): void => {
+    this.props.cars = this.props.cars.filter((car) => car.id !== carId);
+  };
 }
 
 export default CarsCollection;
