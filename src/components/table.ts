@@ -13,7 +13,6 @@ export type TableProps<Type> = {
 };
 
 class Table<Type extends RowData> {
-
   private props: TableProps<Type>;
 
   private tbody: HTMLTableSectionElement;
@@ -32,7 +31,6 @@ class Table<Type extends RowData> {
     this.tbody = document.createElement('tbody');
 
     this.initialize();
-    this.renderView();
   }
 
   private checkColumnsCompatability = (): void => {
@@ -58,6 +56,8 @@ class Table<Type extends RowData> {
       this.thead,
       this.tbody,
     );
+
+    this.renderView();
   };
 
   private renderView = (): void => {
@@ -100,7 +100,7 @@ class Table<Type extends RowData> {
     this.tbody.append(...rowsHtmlElements);
   };
 
-  private addActionsCell = (rowHtmlElement: HTMLTableRowElement, id: string): void => {
+  private addActionsCell = (tr: HTMLTableRowElement, id: string) => {
     const { onDelete } = this.props;
 
     const buttonCell = document.createElement('td');
@@ -109,21 +109,21 @@ class Table<Type extends RowData> {
     deleteButton.type = 'button';
     deleteButton.innerHTML = 'Delete';
     deleteButton.className = 'btn btn-danger';
-    deleteButton.addEventListener('click', () => onDelete(id));
     deleteButton.style.width = '80px';
+    deleteButton.addEventListener('click', () => onDelete(id));
 
     buttonCell.append(deleteButton);
-    rowHtmlElement.append(buttonCell);
+    tr.append(buttonCell);
   };
 
-  public updateProps = (newProps: Partial<TableProps<Type>>): void => {
+  public updateProps = (newProps: Partial<TableProps<Type>>) => {
     this.props = {
       ...this.props,
-      ...newProps
+      ...newProps,
     };
 
     this.renderView();
-  }
+  };
 }
 
 export default Table;
